@@ -1,6 +1,8 @@
-#include <stdio.h>
+#include "funcoes.h"
+
 
 int main() {
-    printf("\tf");
-    return 0;
+    Pilha *P = NULL;
+
+
 }
