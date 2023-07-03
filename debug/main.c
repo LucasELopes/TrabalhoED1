@@ -1,4 +1,12 @@
-#include "funcoes.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <limits.h>
+
+typedef struct No{
+    int* flag;
+    int x, y;
+    struct No *prox;
+}No;
 
 No* criarNo(int *info, int x, int y) {
     No *newFlag = (No*)calloc(1, sizeof(No));
@@ -194,14 +202,14 @@ int mudarAdjacente(No *P1, int **tabuleiro, int linhas, int colunas, int *flags,
             break;
 
         for(int i = 0; i < linhas; i++) {
-            for(int j = 0; j < colunas; j++) {
-                if(noRemovido->flag != &tabuleiro[i][j]  && 
-                ((noRemovido->x-1 == i && noRemovido->y == j) || 
-                (noRemovido->y-1 == j && noRemovido->x == i))) 
+            for(int j = 0; j < colunas; j++){ 
+                if(tabuleiro[i][j] != *(noRemovido->flag) && 
+                ((noRemovido->x == i-1 && noRemovido->y == j) || 
+                (noRemovido->y == j-1 && noRemovido->x == i))) 
                 {   
                     printf("Entrou!\n");
                     tabuleiro[i][j] = *(noRemovido->flag);
-                    inserirBandeira(P2, &tabuleiro[i][j], i, j);
+                    inserirBandeira(P2, &tabuleiro[i][j],i,j);
                     imprimirTabuleiro(tabuleiro, linhas, colunas);
                 }
             }
@@ -216,4 +224,26 @@ void juscelino(int **tabuleiro, int linhas, int colunas, int *flags, int numFlag
         return;
     // int menor = menorRepeticao(tabuleiro, flags, numFlags,); dassssssssssss
     
+}
+
+int main() {
+    No *P = criarNo((int*)-1, -1, -1);
+
+    int linhas, colunas, numFlags;
+    int** tabuleiro;
+    scanf("%d %d", &linhas, &colunas);
+    scanf("%d", &numFlags);
+
+    int flags[numFlags];
+    for(int i = 0; i < numFlags; i++)
+        flags[i] = i;
+
+    tabuleiro = criarTabuleiro(linhas, colunas);
+    imprimirTabuleiro(tabuleiro, linhas, colunas);
+
+    // mudarBandeiraInicial(tabuleiro, flags, numFlags);
+    // imprimirTabuleiro(tabuleiro, linhas, colunas);
+
+    mudarAdjacente(P, tabuleiro, linhas, colunas, flags, numFlags); 
+
 }

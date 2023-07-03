@@ -1,0 +1,11 @@
+Esboço da lógica que utilizarei no trabalho:
+    1- Armazenar todas as bandeiras do tabuleiro em uma pilha. (Feito)
+    2- Guardas todas as ultimas posicoes alteradas.
+    3- Com base nas ultimas alteracoes feitas, segui uma logica para saber quais posicoes adjacentes devem ser alteradas. 
+    4- Procurar a bandeira com menos repetições no tabuleiro, e alterar a posição (0,0) para a bandeira menos repetida. (Feito)
+    5- Vou usar apenas o adjacentes de baixo e da direita da respectiva bandeira.
+    6- Suponha que tenha uma bandeira A na posição(x,y) e outra bandeira B na posição(w,z), se x = w, entao B esta na direita de A.
+    Se y = z, B esta embaixo de A.    
+
+Observações:
+    1- Se a bandeira que menos se repete for única e estiver na posição (0,0), após a substituição da mesma, esta nao estará no tabuleiro portanto alguem teria que ser responsável por armazenar essa bandeira para caso ocorra uma futura troca na bandeira(0,0). (supostamente feito)
