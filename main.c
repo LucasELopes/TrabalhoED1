@@ -2,7 +2,7 @@
 
 
 int main() {
-    No *P = criarNo((int*)-1, -1, -1);
+    NoPilha *P = criarNo((int*)-1, -1, -1);
 
     int linhas, colunas, numFlags;
     int** tabuleiro;
@@ -16,9 +16,9 @@ int main() {
     tabuleiro = criarTabuleiro(linhas, colunas);
     imprimirTabuleiro(tabuleiro, linhas, colunas);
 
-    // mudarBandeiraInicial(tabuleiro, flags, numFlags);
-    // imprimirTabuleiro(tabuleiro, linhas, colunas);
+    // printf("Mais se repetiu: %d\n", repeticao(tabuleiro, linhas, colunas, flags, numFlags, 0));
+    // printf("Menos se repetiu: %d\n", repeticao(tabuleiro, linhas, colunas, flags, numFlags, -1));
 
-    mudarAdjacente(P, tabuleiro, linhas, colunas, flags, numFlags); 
+    mudarAdjacente(tabuleiro, linhas, colunas, flags, numFlags); 
 
 }

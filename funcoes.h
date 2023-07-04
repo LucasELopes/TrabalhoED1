@@ -5,11 +5,17 @@
 #include <stdlib.h>
 #include <limits.h>
 
-typedef struct No{
+typedef struct NoPilha{
     int* flag;
     int x, y;
-    struct No *prox;
-}No;
+    struct NoPilha *prox;
+}NoPilha;
+
+typedef struct noFila
+{
+    int x, y;
+    struct noFila *prox, *ant;    
+}NoFila;
 
 /*
 Função: criarNo
@@ -18,10 +24,20 @@ Descrição:
 Entrada:
     int info: O valor que o a banderia armazenará
 Saída:
-    Fila*: A banderia já alocada, e armazenando seu respectivo valor.
+    No*: O nó alocado dinamicamente.
 */
-No* criarNo(int *info, int x, int y);
+NoPilha* criarNo(int *info, int x, int y);
 
+/*
+Função: criarTabuleiro
+Descrição:
+    Cria uma tabuleiro com base nas entradas do usuário.
+Entrada:
+    int linhas: O número de linhas do tabuleiro.
+    int colunas: O número de colunas do tabuleiro.
+Saída:
+    int**: O tabuleiro criado.
+*/
 int** criarTabuleiro(int linhas, int colunas);
 
 /*
@@ -31,14 +47,35 @@ Descrição:
 Entrada:
     Pilha *P: Pilha onde será inserido o nó.
     int info: O valor que o nó armazenará.
+    int x: O valor da coordenada X.
+    int Y: O valor da coordenada Y.
 Saída:
-    Pilha*: Pilha com o nó inserido.
+    void
 */
-void inserirBandeira(No *P, int *info, int x, int y);
+void inserirBandeira(NoPilha *P, int *info, int x, int y);
 
-void inserirNo(No *P, No *novoNo);
+/*
+Função: inserirNo
+Descrição:
+    Insere um nó já alocado na pilha.
+Entrada:
+    Pilha *P: Pilha onde será inserido o nó.
+    No *novoNo: insere o Nó já alocado na pilha.
+Saída:
+    void
+*/
+void inserirNo(NoPilha *P, NoPilha *novoNo);
 
-No* removeNo(No *P);
+/*
+Função: removeNo
+Descrição:
+    Remove o último nó inserido na pilha.
+Entrada:
+    Pilha *P: Pilha onde será removido o nó.
+Saída:
+    No*: nó removido.
+*/
+NoPilha* removeNo(NoPilha *P);
 
 /*
 Função: imprimirPilha
@@ -52,37 +89,52 @@ Saída:
 */
 void imprimirTabuleiro(int **tabuleiro, int linhas, int colunas);
 
-void imprimirPilha(No *P, int colunas);
+void imprimirPilha(NoPilha *P, int colunas);
 
 /*
-Função: menorRepeticao
+Função: repeticao
 Descrição:
     retorna o inteiro que menos se repetiu na pilha.
 Entrada:
-    Pilha *P: A pilha que será feita a busca do inteiro.
-    int *flags: Um vetor com as bandeiras que a pilha possui.
-    int numFlags: O tamanho do vetor *flags.
+    int **tabuleiro: O tabuleiro onde será procurado o elemento que menos se repetiu.
+    int linhas: As quatidades de linhas do tabuleiro
+    int colunas: As quatidades de colunas do tabuleiro
+    int *flags: vetor contendo os tipos de bandeiras presentes no tabuleiro.
+    int numFlags: A quantidade de bandeiras.
 Saída:
-   int: O inteiro que menos repetiu-se na pilha.
+   int: O inteiro que menos repetiu na pilha.
 */
+int repeticao(int **tabuleiro, int linhas, int colunas, int *flags, int numFlags, int menorOuMaior);
 
-// int menorRepeticao(No *P, int *flags, int numFlags);
-int menorRepeticao(int **tabuleiro, int linhas, int colunas, int *flags, int numFlags);
-
-
-// void mudarBandeiraInicial(int **tabueleiro, int *flags, int numFlags);
-void mudarBandeiraInicial(int **tabueleiro, int linhas, int colunas, int *flags, int numFlags);
-
-int mudarAdjacente(No *P, int **tabuleiro, int linhas, int colunas, int *flag, int numFlags);
-
-//Funcao certa
-// void mudarAdjacente(No *P, No *flag);
 
 /*
-    Função juscelino será resposável por executar o objetivo que o trabalho propõe
-    ele executará outras funções implementadas, para chegar no objetivo do desafio.
-    A mesma se encontra em desenvolvimento.
+Função: mudarBandeiraInicial
+Descrição:
+    retorna o inteiro que menos se repetiu na pilha.
+Entrada:
+    int **tabuleiro: O tabuleiro onde será modificado a casa de posicao 0,0.
+    int linhas: As quatidades de linhas do tabuleiro
+    int colunas: As quatidades de colunas do tabuleiro
+    int *flags: vetor contendo os tipos de bandeiras presentes no tabuleiro.
+    int numFlags: A quantidade de bandeiras.
+Saída:
+   void
 */
-void juscelino(int **tabuleiro, int linhas, int colunas, int *flags, int numFlags);
+int mudarBandeiraInicial(int **tabueleiro, int linhas, int colunas, int *flags, int numFlags);
+
+/*
+Função: mudarAdjacente
+Descrição:
+    faz a busca em profundidade da matriz, e modifica os elementos.
+Entrada:
+    int **tabuleiro: O tabuleiro onde será modificado as casas adjacentes.
+    int linhas: As quatidades de linhas do tabuleiro
+    int colunas: As quatidades de colunas do tabuleiro
+    int *flags: vetor contendo os tipos de bandeiras presentes no tabuleiro.
+    int numFlags: A quantidade de bandeiras.
+Saída:
+   void
+*/
+void mudarAdjacente(int **tabuleiro, int linhas, int colunas, int *flag, int numFlags);
 
 #endif

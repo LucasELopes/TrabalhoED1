@@ -2,7 +2,7 @@ all: teste
 	./teste
 
 in: teste 
-	./teste < input/3.in
+	./teste < input/4.in
 
 teste: funcoes.o main.o
 	gcc -o teste funcoes.o main.o

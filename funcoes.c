@@ -1,7 +1,7 @@
 #include "funcoes.h"
 
-No* criarNo(int *info, int x, int y) {
-    No *newFlag = (No*)calloc(1, sizeof(No));
+NoPilha* criarNo(int *info, int x, int y) {
+    NoPilha *newFlag = (NoPilha*)calloc(1, sizeof(NoPilha));
     if(!newFlag) {
         printf("Erro na alocação!\n");
         exit(1);
@@ -17,7 +17,7 @@ int** criarTabuleiro(int linhas, int colunas) {
 
     tabuleiro = (int**)calloc(linhas, sizeof(int*));
 
-    for(int i = 0; i < colunas; i++)
+    for(int i = 0; i < linhas; i++)
         tabuleiro[i] = (int*)calloc(colunas, sizeof(int));
     
     for(int i = 0; i < linhas; i++){
@@ -29,23 +29,23 @@ int** criarTabuleiro(int linhas, int colunas) {
     return tabuleiro;
 }
 
-void inserirBandeira(No *P, int *info, int x, int y) {
-    No *novoNo = criarNo(info, x, y);
+void inserirBandeira(NoPilha *P, int *info, int x, int y) {
+    NoPilha *novoNo = criarNo(info, x, y);
     novoNo->flag = info;
     if(P->prox)
         novoNo->prox = P->prox;
     P->prox = novoNo;
 }
 
-void inserirNo(No *P, No *novoNo) {
-    No *aux = P->prox;
+void inserirNo(NoPilha *P, NoPilha *novoNo) {
+    NoPilha *aux = P->prox;
     if(P->prox)
         novoNo->prox = P->prox;
     P->prox = novoNo;
 }
 
-No* removeNo(No *P) {
-    No *aux = P->prox;
+NoPilha* removeNo(NoPilha *P) {
+    NoPilha *aux = P->prox;
     if(P->prox) {
         P->prox = aux->prox;
         aux->prox = NULL;
@@ -63,10 +63,10 @@ void imprimirTabuleiro(int **tabuleiro, int linhas, int colunas) {
     printf("\n");
 }
 
-void imprimirPilha(No *P, int colunas) {
+void imprimirPilha(NoPilha *P, int colunas) {
     if(P->prox) {
         int split = 0;
-        No *aux = P->prox;
+        NoPilha *aux = P->prox;
         while(aux) {
             printf("%d ", *(aux->flag));
             aux = aux->prox;
@@ -113,24 +113,35 @@ void imprimirPilha(No *P, int colunas) {
 //     }
 // }
 
-int menorRepeticao(int **tabuleiro, int linhas, int colunas, int *flags, int numFlags){
+int repeticao(int **tabuleiro, int linhas, int colunas, int *flags, int numFlags, int menorOuMaior){
     if(!tabuleiro) 
         printf("tabuleiro vazio!\n");
     else {
         int repeticao = 0, indice = 0;
-        int menor[2] = {*(flags + indice), INT_MAX}; // menor[0] = Armazenar a bandeira que menos se repetiu.
+        int menor[2] = {*(flags+indice)}; // menor[0] = Armazenar a bandeira que menos se repetiu.
                                                      // menor[1] = O números de repetições da bandeiras armazenada no menor[0]; 
+        if(menorOuMaior >= 0)
+            menor[1] = INT_MIN;
+        else
+            menor[1] = INT_MAX;
         while(indice < numFlags) {
-
             for(int i = 0; i < linhas; i++) {
                 for(int j = 0; j < colunas; j++) {
                     if(tabuleiro[i][j] == *(flags+indice))
                         repeticao++;
                 }
             }
-            if(menor[1] > repeticao) {
-                menor[0] = *(flags+indice);
-                menor[1] = repeticao;
+            if(menorOuMaior >= 0){
+                if(menor[1] < repeticao && *(flags+indice) != tabuleiro[0][0]) {
+                    menor[0] = *(flags+indice);
+                    menor[1] = repeticao;
+                }
+            }
+            else {
+                if(menor[1] > repeticao && *(flags+indice) != tabuleiro[0][0]) {
+                    menor[0] = *(flags+indice);
+                    menor[1] = repeticao;
+                }
             }
             repeticao = 0;
             indice++;
@@ -139,81 +150,109 @@ int menorRepeticao(int **tabuleiro, int linhas, int colunas, int *flags, int num
     }
 }
 
-void mudarBandeiraInicial(int **tabueleiro, int linhas, int colunas, int *flags, int numFlags) {
+int mudarBandeiraInicial(int **tabuleiro, int linhas, int colunas, int *flags, int numFlags) {
     if(numFlags <= 2) {
-        if(tabueleiro[0][0] == *(flags+1)) 
-            tabueleiro[0][0] = *(flags);
-        else 
-            tabueleiro[0][0] = *(flags+1);
+        if(tabuleiro[0][0] == *(flags+1)) {
+            tabuleiro[0][0] = *(flags);
+            return *(flags+1);
+        }
+        else {
+            tabuleiro[0][0] = *(flags+1);
+            return *(flags);
+        }
     }
     else {
-        int menor = menorRepeticao(tabueleiro, linhas, colunas, flags, numFlags);
-        if(menor != tabueleiro[0][0])
-            tabueleiro[0][0] = menor;
-        else {
-            int retirandoMenor[numFlags-1], indice = 0;
-            for(int i = 0; i < numFlags; i++) {
-                if(menor != *(flags+i))  {
-                    retirandoMenor[indice] = i;
-                    indice++;
+        int valorAnterior = tabuleiro[0][0];
+        if(linhas > 2 && colunas > 2) {
+            if(tabuleiro[0][0] != tabuleiro[1][0] && tabuleiro[1][0] == tabuleiro[0][1]){
+                tabuleiro[0][0] = tabuleiro[1][0];    
+            }
+            else {
+
+                if(tabuleiro[2][0] == tabuleiro[1][1] || tabuleiro[1][1] == tabuleiro[1][0] || tabuleiro[2][0] == tabuleiro[1][0]) {
+                    tabuleiro[0][0] = tabuleiro[1][0];
                 }
-                i++;
+                else if(tabuleiro[0][2] == tabuleiro[1][1] || tabuleiro[1][1] == tabuleiro[0][1] || tabuleiro[0][2] == tabuleiro[0][1]) {
+                    tabuleiro[0][0] = tabuleiro[0][1];
+                }
+                else {
+                    int maiorRepeticao = repeticao(tabuleiro, linhas, colunas, flags, numFlags, 0);
+                    if(tabuleiro[0][0] != maiorRepeticao && (tabuleiro[1][0] == maiorRepeticao || tabuleiro[0][1] == maiorRepeticao)) {
+                        tabuleiro[0][0] = maiorRepeticao;
+                    }
+                    else{
+                        tabuleiro[0][0] = tabuleiro[1][0];
+                    }
+                }
             }
         }
+        return valorAnterior;
+        // int menor = menorRepeticao(tabueleiro, linhas, colunas, flags, numFlags);
+        // if(menor != tabueleiro[0][0])
+        //     tabueleiro[0][0] = menor;
+        // else {
+        //     int retirandoMenor[numFlags-1], indice = 0;
+        //     for(int i = 0; i < numFlags; i++) {
+        //         if(menor != *(flags+i))  {
+        //             retirandoMenor[indice] = i;
+        //             indice++;
+        //         }
+        //     }
+        //     tabueleiro[0][0] = menorRepeticao(tabueleiro, linhas, colunas, retirandoMenor, (numFlags-1));
+        // }
+        // return menor;
     } 
+    
 }
 
-int mudarAdjacente(No *P1, int **tabuleiro, int linhas, int colunas, int *flags, int numFlags) {
-    //Pilhas
-    No* P2 = criarNo((int*)-1, -1, -1);
+int verificarTabuleiro(int** tabuleiro, int linhas, int colunas) {
+    int comparador = tabuleiro[0][0]; 
+    for(int i = 0; i < linhas; i++) {
+        for(int j = 0; j < colunas; j++) {
+            if(comparador != tabuleiro[i][j])
+                return 0;
+        }
+    }
+    return 1;
+}
 
-    // Auxiliares das pilhas 
-    No* aux = P2->prox;
+void mudarAdjacente(int **tabuleiro, int linhas, int colunas, int *flags, int numFlags) {
+    NoPilha* P = criarNo((int*)-1, -1, -1);
+    NoPilha* noRemovido = NULL;
 
-    int menorELem = menorRepeticao(tabuleiro, linhas, colunas, flags, numFlags);
-    int finalizado = 0;
-    
-    No* noRemovido = NULL;
-    No* encontrarAdjacentes = NULL;
+    int troca = 0;
 
-    // for(int i = 0; i < linhas; i++){
-    //     for(int j = 0; j < colunas; j++){
-    //     }
-    // }
+    inserirBandeira(P, &tabuleiro[0][0], 0, 0);
 
+    int k = mudarBandeiraInicial(tabuleiro, linhas, colunas, flags, numFlags);
+    troca++;
 
-    inserirBandeira(P2, &tabuleiro[0][0], 0, 0);
-
-    mudarBandeiraInicial(tabuleiro, linhas, colunas, flags, numFlags);
     imprimirTabuleiro(tabuleiro, linhas , colunas);
 
-    while(P2->prox) {
-        noRemovido = removeNo(P2);
-        printf("x: %d y: %d valor: %d\n", noRemovido->x, noRemovido->y, *(noRemovido->flag));
-        if(!noRemovido)
-            break;
+    while(P->prox) {
+        noRemovido = removeNo(P);
 
         for(int i = 0; i < linhas; i++) {
             for(int j = 0; j < colunas; j++) {
-                if(noRemovido->flag != &tabuleiro[i][j]  && 
-                ((noRemovido->x-1 == i && noRemovido->y == j) || 
-                (noRemovido->y-1 == j && noRemovido->x == i))) 
+                if(*(noRemovido->flag) != tabuleiro[i][j] && 
+                *(noRemovido->flag) == k &&
+                ((noRemovido->x == i-1 && noRemovido->y == j) || 
+                (noRemovido->y == j-1 && noRemovido->x == i))) 
                 {   
-                    printf("Entrou!\n");
                     tabuleiro[i][j] = *(noRemovido->flag);
-                    inserirBandeira(P2, &tabuleiro[i][j], i, j);
+                    inserirBandeira(P, &tabuleiro[i][j], i, j);
                     imprimirTabuleiro(tabuleiro, linhas, colunas);
                 }
             }
         }
+        if(!P->prox) {
+            if(!verificarTabuleiro(tabuleiro, linhas, colunas)) {
+                k = mudarBandeiraInicial(tabuleiro, linhas, colunas, flags, numFlags);
+                troca++;
+                inserirBandeira(P, &tabuleiro[0][0], 0, 0);
+            }
+        }
     }
-
-    imprimirTabuleiro(tabuleiro, linhas , colunas);
+    printf("%d\n", troca);
 }
 
-void juscelino(int **tabuleiro, int linhas, int colunas, int *flags, int numFlags) {
-    if(!tabuleiro) 
-        return;
-    // int menor = menorRepeticao(tabuleiro, flags, numFlags,); dassssssssssss
-    
-}
