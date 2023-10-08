@@ -18,4 +18,3 @@ funcoes.o: funcoes.c funcoes.h
 
 clean:
 	rm -r teste *.o *.out
-	
